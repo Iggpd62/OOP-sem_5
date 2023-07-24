@@ -25,10 +25,6 @@ class Peasant extends BaseHero implements CharacterInterface {
             closestEnemy.takeDamage(averageDamage);
         }
 
-        if (checkForPeasant()) {
-            return;
-        }
-
         arrows--;
     }
 
@@ -50,15 +46,6 @@ class Peasant extends BaseHero implements CharacterInterface {
     private int calculateAverageDamage() {
         // Расчет среднего повреждения
         return 15;
-    }
-
-    private boolean checkForPeasant() {
-        for (CharacterInterface hero : heroes1) {
-            if (hero instanceof Peasant) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void takeDamage(int damage) {

@@ -26,6 +26,10 @@ class Sniper extends BaseHero implements CharacterInterface{
              closestEnemy.takeDamage(averageDamage);
          }
 
+         if (checkForPeasant()) {
+             return;
+         }
+
          arrows--;
      }
 
@@ -33,7 +37,7 @@ class Sniper extends BaseHero implements CharacterInterface{
         CharacterInterface closestEnemy = null;
         double closestDistance = Double.MAX_VALUE;
 
-        for (CharacterInterface enemy : heroes1) {
+        for (CharacterInterface enemy : heroes2) {
             double distance = Main.calculateDistance(this, enemy);
             if (distance < closestDistance) {
                 closestDistance = distance;
@@ -49,7 +53,14 @@ class Sniper extends BaseHero implements CharacterInterface{
         return 15;
     }
 
-
+    private boolean checkForPeasant() {
+        for (CharacterInterface hero : heroes1) {
+            if (hero instanceof Peasant) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void takeDamage(int damage) {
         health -= damage;
