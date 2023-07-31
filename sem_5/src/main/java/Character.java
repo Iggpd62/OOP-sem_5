@@ -11,8 +11,6 @@ abstract class BaseHero implements CharacterInterface {
         this.speed = speed;
         this.coordinates = new Coordinates(x, y);
     }
-
-
     public void attack() {
         System.out.println(name + " наносит удар!");
     }

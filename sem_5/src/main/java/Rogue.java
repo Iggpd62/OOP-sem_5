@@ -3,63 +3,106 @@ import java.util.List;
 // Класс, описывающий разбойника
 class Rogue extends BaseHero implements CharacterInterface {
     private int arrows;
-    private List<CharacterInterface> heroes1;
-    private List<CharacterInterface> heroes2;
+    private final List<CharacterInterface> heroes1;
+    private CharacterInterface nearestEnemy;
+    public double calculateDistance(Coordinates c1, Coordinates c2){
+        return Math.sqrt(Math.pow(c2.getX() - c1.getX(), 2) + Math.pow(c2.getY() - c1.getY(), 2));
+    }
     public Rogue (String name, int health, int speed, int x, int y, int arrows, List<CharacterInterface> heroes1, List<CharacterInterface> heroes2) {
         super(name, health, speed, x, y);
         this.arrows = arrows;
         this.heroes1 = heroes1;
-        this.heroes2 = heroes2;
     }
     public void step() {
         if (health <= 0) {
+            System.out.println(name + " погиб, не может совершать ход.");
             return;
         }
 
         if (arrows <= 0) {
+            System.out.println(name + " не осталось стрел, не может совершать ход.");
             return;
         }
 
-        CharacterInterface closestEnemy = findClosestEnemy();
-        if (closestEnemy != null) {
-            int averageDamage = calculateAverageDamage();
-            closestEnemy.takeDamage(averageDamage);
+        CharacterInterface nearestEnemy = findNearestEnemy();
+        if (nearestEnemy == null) {
+            System.out.println("Нет врагов вокруг " + name + ", не может совершать ход.");
+            return;
         }
 
-        if (checkForPeasant()) {
+        moveTowardsEnemy(nearestEnemy);
+
+        if (isCharacterOnTile(nearestEnemy.getCoordinates().getX(), nearestEnemy.getCoordinates().getY())) {
+            System.out.println(name + " не может двигаться на клетку с живым персонажем.");
             return;
+        }
+
+        if (calculateDistance(nearestEnemy.getCoordinates().getX(), nearestEnemy.getCoordinates().getY()) == 1) {
+            attackEnemy(nearestEnemy);
         }
 
         arrows--;
     }
-
-    private CharacterInterface findClosestEnemy() {
-        CharacterInterface closestEnemy = null;
+    public void attack(CharacterInterface enemy) {
+    }
+    private CharacterInterface findNearestEnemy() {
+        CharacterInterface nearestEnemy = null;
         double closestDistance = Double.MAX_VALUE;
 
         for (CharacterInterface enemy : heroes1) {
-            double distance = Main.calculateDistance(this, enemy);
+            assert false;
+            double distance = calculateDistance(enemy.getCoordinates().getX(), nearestEnemy.getCoordinates().getY());
             if (distance < closestDistance) {
                 closestDistance = distance;
-                closestEnemy = enemy;
+                nearestEnemy = enemy;
             }
         }
 
-        return closestEnemy;
+        return null;
+    }
+
+    private void moveTowardsEnemy(CharacterInterface enemy) {
+        int enemyX = enemy.getCoordinates().getX();
+        int enemyY = enemy.getCoordinates().getY();
+
+        int deltaX = enemyX - coordinates.getX();
+        int deltaY = enemyY - coordinates.getY();
+
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            coordinates.setX(coordinates.getX() + Integer.compare(deltaX, 0));
+        } else {
+            coordinates.setY(coordinates.getY() + Integer.compare(deltaY, 0));
+        }
+        System.out.println(name + " двигается в сторону врага.");
+    }
+
+
+    private boolean isCharacterOnTile(int posX, int posY) {
+        for (CharacterInterface hero : heroes1) {
+            if (hero.getCoordinates().getX() == posX && hero.getCoordinates().getY() == posY) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private double calculateDistance(int posX, int posY) {
+        int deltaX = Math.abs(posX - getCoordinates().getX());
+        int deltaY = Math.abs(posY - getCoordinates().getY());
+
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+
+    private void attackEnemy(CharacterInterface enemy) {
+        int damage = calculateAverageDamage();
+        enemy.takeDamage(damage);
+        System.out.println(name + " атакует врага " + enemy.getInfo() + " и наносит " + damage + " урона.");
     }
 
     private int calculateAverageDamage() {
         // Расчет среднего повреждения
         return 15;
-    }
-
-    private boolean checkForPeasant() {
-        for (CharacterInterface hero : heroes2) {
-            if (hero instanceof Peasant) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void takeDamage(int damage) {
@@ -68,9 +111,9 @@ class Rogue extends BaseHero implements CharacterInterface {
             System.out.println(name + " погиб!");
         }
     }
-    public void farm() {
 
-        System.out.println(name + " разбойничает");
+    public void farm() {
+        System.out.println(name + " удар копьем");
         System.out.println(name + " делает шаг!");
     }
 }
